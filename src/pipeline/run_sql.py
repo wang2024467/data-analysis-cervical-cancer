@@ -1,5 +1,9 @@
 import argparse
+import logging
 from pathlib import Path
+from datetime import datetime
+import uuid
+
 import duckdb
 import pandas as pd
 import yaml
@@ -47,6 +51,17 @@ EXPECTED_COLUMNS = {
 }
 
 
+def build_logger(run_id: str) -> logging.Logger:
+    logger = logging.getLogger("cervical_pipeline")
+    logger.setLevel(logging.INFO)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
+        logger.addHandler(handler)
+    logger.info("pipeline_start run_id=%s", run_id)
+    return logger
+
+
 def load_config(config_path: Path) -> dict:
     with config_path.open("r", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -76,14 +91,60 @@ def align_to_expected_columns(df: pd.DataFrame) -> pd.DataFrame:
     return aligned
 
 
-def execute_sql_folder(conn: duckdb.DuckDBPyConnection, folder: Path) -> None:
+def execute_sql_folder(conn: duckdb.DuckDBPyConnection, folder: Path, logger: logging.Logger) -> None:
     for sql_file in sorted(folder.glob("*.sql")):
         sql = sql_file.read_text(encoding="utf-8")
         conn.execute(sql)
-        print(f"Executed: {sql_file}")
+        logger.info("executed_sql file=%s", sql_file)
+
+
+def evaluate_quality_gate(conn: duckdb.DuckDBPyConnection, config: dict, logger: logging.Logger) -> None:
+    quality_cfg = config.get("quality_gate", {})
+    max_null_rate = float(quality_cfg.get("max_null_rate", 1.0))
+    allow_range_violations = int(quality_cfg.get("allow_range_violations", 0))
+    allow_consistency_violations = int(quality_cfg.get("allow_consistency_violations", 0))
+
+    max_observed_null_rate = conn.sql("SELECT COALESCE(MAX(null_rate), 0) AS v FROM check_null_rates").fetchone()[0]
+    range_violations = conn.sql(
+        """
+        SELECT COALESCE(invalid_age_rows, 0)
+             + COALESCE(invalid_first_sexual_intercourse_rows, 0)
+             + COALESCE(invalid_pregnancy_rows, 0)
+        FROM check_range_violations
+        """
+    ).fetchone()[0]
+    consistency_violations = conn.sql(
+        """
+        SELECT COALESCE(std_flag_conflict_rows, 0)
+             + COALESCE(possible_label_mismatch_rows, 0)
+        FROM check_consistency_violations
+        """
+    ).fetchone()[0]
+
+    logger.info(
+        "quality_summary max_null_rate=%.4f range_violations=%s consistency_violations=%s",
+        float(max_observed_null_rate),
+        int(range_violations),
+        int(consistency_violations),
+    )
+
+    failures = []
+    if float(max_observed_null_rate) > max_null_rate:
+        failures.append(f"max_null_rate_exceeded observed={max_observed_null_rate:.4f} threshold={max_null_rate:.4f}")
+    if int(range_violations) > allow_range_violations:
+        failures.append(f"range_violations_exceeded observed={range_violations} allowed={allow_range_violations}")
+    if int(consistency_violations) > allow_consistency_violations:
+        failures.append(
+            f"consistency_violations_exceeded observed={consistency_violations} allowed={allow_consistency_violations}"
+        )
+
+    if failures:
+        raise ValueError("quality_gate_failed: " + " | ".join(failures))
 
 
 def run_pipeline(config_path: Path) -> None:
+    run_id = f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:8]}"
+    logger = build_logger(run_id)
     config = load_config(config_path)
     raw_csv = Path(config["raw_csv_path"])
     db_path = Path(config["duckdb_path"])
@@ -92,19 +153,25 @@ def run_pipeline(config_path: Path) -> None:
     if not raw_csv.exists():
         raise FileNotFoundError(f"Raw CSV not found: {raw_csv}")
 
+    logger.info("load_input path=%s", raw_csv)
     df = pd.read_csv(raw_csv)
+    input_rows = len(df)
+    logger.info("input_rows=%s input_columns=%s", input_rows, len(df.columns))
+
     df = normalize_columns(df)
     df = align_to_expected_columns(df)
 
     conn = duckdb.connect(str(db_path))
     conn.execute("CREATE OR REPLACE TABLE raw_cervical_cancer AS SELECT * FROM df")
 
-    execute_sql_folder(conn, Path("sql/staging"))
-    execute_sql_folder(conn, Path("sql/marts"))
-    execute_sql_folder(conn, Path("sql/checks"))
+    execute_sql_folder(conn, Path("sql/staging"), logger)
+    execute_sql_folder(conn, Path("sql/marts"), logger)
+    execute_sql_folder(conn, Path("sql/checks"), logger)
+
+    evaluate_quality_gate(conn, config, logger)
 
     conn.close()
-    print(f"Pipeline complete. DuckDB file: {db_path}")
+    logger.info("pipeline_complete run_id=%s db_path=%s", run_id, db_path)
 
 
 if __name__ == "__main__":
