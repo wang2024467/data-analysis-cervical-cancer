@@ -1,0 +1,2 @@
+raw_csv_path: data/samples/cervical_cancer_sample.csv
+duckdb_path: data/processed/cervical_cancer.duckdb
