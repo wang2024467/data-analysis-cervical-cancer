@@ -653,8 +653,3 @@ print(con.sql('show tables').df())
 print(con.sql('select * from mart_target_prevalence').df())
 PY
 ```
-
-### 4. Full-field support notes
-- The pipeline now aligns raw headers to a canonical full schema covering all listed cervical-cancer fields.
-- Alias handling is included for common naming differences (e.g., `Cytology`/`Citology`, `First sexual intercourse` vs `First sexual intercourse (age)`).
-- Any missing expected columns are created as null so SQL can still run deterministically.
