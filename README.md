@@ -637,7 +637,7 @@ python -m src.pipeline.run_sql --config configs/pipeline.yml
 ```
 
 This command will:
-- read sample CSV (`data/samples/cervical_cancer_sample.csv`)
+- auto-select input CSV: newest file in `data/raw/*.csv`, otherwise sample fallback
 - normalize column names
 - build `raw_cervical_cancer` and `stg_patients`
 - build marts (`mart_target_prevalence`, `mart_risk_by_age`)
@@ -668,3 +668,8 @@ PY
 ```bash
 pytest -q
 ```
+
+### 7. Input auto-detection behavior
+- If `data/raw/` contains one or more `.csv` files, the pipeline automatically picks the newest raw file.
+- If `data/raw/` is empty, it automatically falls back to `data/samples/cervical_cancer_sample.csv`.
+- This allows updates without editing config every time.

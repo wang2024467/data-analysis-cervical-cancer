@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import uuid
+from typing import Optional
 
 import duckdb
 import pandas as pd
@@ -91,6 +92,33 @@ def align_to_expected_columns(df: pd.DataFrame) -> pd.DataFrame:
     return aligned
 
 
+def pick_raw_csv(raw_dir: Path) -> Optional[Path]:
+    if not raw_dir.exists():
+        return None
+    candidates = sorted(
+        [p for p in raw_dir.glob("*.csv") if p.is_file()],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    return candidates[0] if candidates else None
+
+
+def resolve_input_csv(config: dict, logger: logging.Logger) -> Path:
+    raw_dir = Path(config.get("raw_dir", "data/raw"))
+    sample_csv = Path(config.get("sample_csv_path", "data/samples/cervical_cancer_sample.csv"))
+
+    raw_csv = pick_raw_csv(raw_dir)
+    if raw_csv:
+        logger.info("input_source=raw path=%s", raw_csv)
+        return raw_csv
+
+    if sample_csv.exists():
+        logger.warning("input_source=sample_fallback path=%s", sample_csv)
+        return sample_csv
+
+    raise FileNotFoundError(f"No CSV found in raw_dir={raw_dir} and sample_csv_path missing: {sample_csv}")
+
+
 def execute_sql_folder(conn: duckdb.DuckDBPyConnection, folder: Path, logger: logging.Logger) -> None:
     for sql_file in sorted(folder.glob("*.sql")):
         sql = sql_file.read_text(encoding="utf-8")
@@ -146,15 +174,13 @@ def run_pipeline(config_path: Path) -> None:
     run_id = f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:8]}"
     logger = build_logger(run_id)
     config = load_config(config_path)
-    raw_csv = Path(config["raw_csv_path"])
-    db_path = Path(config["duckdb_path"])
+
+    input_csv = resolve_input_csv(config, logger)
+    db_path = Path(config.get("duckdb_path", "data/processed/cervical_cancer.duckdb"))
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    if not raw_csv.exists():
-        raise FileNotFoundError(f"Raw CSV not found: {raw_csv}")
-
-    logger.info("load_input path=%s", raw_csv)
-    df = pd.read_csv(raw_csv)
+    logger.info("load_input path=%s", input_csv)
+    df = pd.read_csv(input_csv)
     input_rows = len(df)
     logger.info("input_rows=%s input_columns=%s", input_rows, len(df.columns))
 
