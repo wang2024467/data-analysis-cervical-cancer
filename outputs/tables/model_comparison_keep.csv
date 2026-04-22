@@ -1,0 +1,2 @@
+model,status,reason,drop_inconsistent
+not_run,skipped,scikit-learn is required for baseline models. Install requirements.txt first.,False

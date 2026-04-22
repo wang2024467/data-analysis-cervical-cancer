@@ -66,12 +66,15 @@ def evaluate_model(name: str, model: Any, X_test: pd.DataFrame, y_test: pd.Serie
 
 
 def train_models(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
-    from sklearn.compose import ColumnTransformer
-    from sklearn.impute import SimpleImputer
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.model_selection import train_test_split
-    from sklearn.pipeline import Pipeline
+    try:
+        from sklearn.compose import ColumnTransformer
+        from sklearn.impute import SimpleImputer
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.model_selection import train_test_split
+        from sklearn.pipeline import Pipeline
+    except Exception as e:
+        raise RuntimeError("scikit-learn is required for baseline models. Install requirements.txt first.") from e
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
@@ -134,29 +137,58 @@ def main() -> None:
     df = add_inconsistent_flag(df)
     X, y = prepare_xy(df, drop_inconsistent=args.drop_inconsistent)
 
-    result = train_models(X, y)
-    out_path = Path(args.out)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    result.to_csv(out_path, index=False)
-
     notes = Path(args.notes)
     notes.parent.mkdir(parents=True, exist_ok=True)
-    notes.write_text(
-        "\n".join(
-            [
-                "# Experiment Note",
-                f"drop_inconsistent={args.drop_inconsistent}",
-                f"rows_used={len(X)}",
-                f"target_positive_rate={float(y.mean()):.6f}",
-                "models_trained=" + ", ".join(result["model"].tolist()),
-            ]
-        ),
-        encoding="utf-8",
-    )
 
-    print(result)
-    print(f"Saved: {out_path}")
-    print(f"Saved: {notes}")
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        result = train_models(X, y)
+        result.to_csv(out_path, index=False)
+
+        notes.write_text(
+            "\n".join(
+                [
+                    "# Experiment Note",
+                    f"drop_inconsistent={args.drop_inconsistent}",
+                    f"rows_used={len(X)}",
+                    f"target_positive_rate={float(y.mean()):.6f}",
+                    "models_trained=" + ", ".join(result["model"].tolist()),
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        print(result)
+        print(f"Saved: {out_path}")
+        print(f"Saved: {notes}")
+    except RuntimeError as e:
+        pd.DataFrame(
+            [
+                {
+                    "model": "not_run",
+                    "status": "skipped",
+                    "reason": str(e),
+                    "drop_inconsistent": args.drop_inconsistent,
+                }
+            ]
+        ).to_csv(out_path, index=False)
+
+        notes.write_text(
+            "\n".join(
+                [
+                    "# Experiment Note",
+                    "status=skipped",
+                    f"reason={str(e)}",
+                    f"drop_inconsistent={args.drop_inconsistent}",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        print(str(e))
+        print(f"Saved: {out_path}")
+        print(f"Saved skip note: {notes}")
 
 
 if __name__ == "__main__":

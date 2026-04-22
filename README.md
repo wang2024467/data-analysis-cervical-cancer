@@ -695,3 +695,34 @@ python -m src.modeling.train_compare --db data/processed/cervical_cancer.duckdb 
 - Records experiment notes for traceability.
 - Adds `inconsistent_flag` in modeling workflow.
 - Trains baseline (`logistic_regression`) and advanced models (`random_forest`, plus `xgboost` / `lightgbm` when available).
+
+## 15) Quality Gate Profiles + CI
+
+### Strict profile (default)
+```bash
+python -m src.pipeline.run_sql --config configs/pipeline.yml
+```
+
+### Exploratory profile (for sample/model iteration)
+```bash
+python -m src.pipeline.run_sql --config configs/pipeline_exploratory.yml
+```
+
+### CI
+A minimal GitHub Actions workflow now runs:
+1. `pytest -q`
+2. pipeline smoke run (`python -m src.pipeline.run_sql --config configs/pipeline_exploratory.yml`)
+
+## 16) Reproducible Power BI Workflow (Local Raw Data Ready)
+
+### Export dashboard inputs
+```bash
+python -m src.reporting.export_powerbi_inputs --db data/processed/cervical_cancer.duckdb --out dashboards/powerbi/data
+```
+
+### Dashboard contract
+- KPI cards from `mart_target_prevalence.csv`
+- age-group risk bar chart from `mart_risk_by_age.csv`
+- data quality panel from check CSVs
+
+See `dashboards/powerbi/README.md` for the full, repeatable local-data workflow.
