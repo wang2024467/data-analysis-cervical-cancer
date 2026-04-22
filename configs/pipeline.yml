@@ -1,0 +1,7 @@
+raw_dir: data/raw
+sample_csv_path: data/samples/cervical_cancer_sample.csv
+duckdb_path: data/processed/cervical_cancer.duckdb
+quality_gate:
+  max_null_rate: 0.25
+  allow_range_violations: 0
+  allow_consistency_violations: 0
