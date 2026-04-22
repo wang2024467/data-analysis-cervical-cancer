@@ -695,6 +695,18 @@ python -m src.modeling.train_compare --db data/processed/cervical_cancer.duckdb 
 - Records experiment notes for traceability.
 - Adds `inconsistent_flag` in modeling workflow.
 - Trains baseline (`logistic_regression`) and advanced models (`random_forest`, plus `xgboost` / `lightgbm` when available).
+- Exports decision-ready artifacts:
+  - threshold decision table (`threshold_decision_*.csv`) with recall/precision/FPR/FN/FP
+  - error slice table (`error_slices_*.csv`) by age group / smoker / STD history
+  - calibration table (`calibration_*.csv`) with Brier score
+  - quality summary table (`quality_summary_*.csv`) from null/range/consistency checks
+  - one-page dashboard KPI table (`dashboard_one_page_*.csv`)
+- Saves model figures to `outputs/figures/`:
+  - ROC curves
+  - PR curves
+  - threshold tradeoff chart
+  - confusion matrix heatmaps
+  - feature importance chart (for best model when available)
 
 ## 15) Quality Gate Profiles + CI
 
