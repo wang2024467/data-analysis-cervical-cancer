@@ -42,7 +42,7 @@ Recommended approach: keep the cervical-cancer dataset as core analysis data, an
 3. **General public APIs (if health-specific endpoint is limited)**
    - Acceptable if you clearly frame transformation and analytics logic.
 
-### Why API track matters for jobs
+### Why API track matters
 - Demonstrates real ingestion workflows (auth/rate limit/retries).
 - Shows JSON normalization and schema control.
 - Fits ETL + validation + analytics + model/AI integration patterns.
@@ -60,7 +60,7 @@ Keep graceful fallback:
 
 ---
 
-## 3) What This Project Should Prove to Hiring Managers
+## 3) What This Project Apply
 
 ### A. Python
 - Clean modular scripts (not only notebook cells)
