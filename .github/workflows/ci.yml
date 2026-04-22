@@ -25,4 +25,4 @@ jobs:
         run: pytest -q
 
       - name: Smoke pipeline
-        run: python -m src.pipeline.run_sql --config configs/pipeline.yml
+        run: python -m src.pipeline.run_sql --config configs/pipeline_exploratory.yml
