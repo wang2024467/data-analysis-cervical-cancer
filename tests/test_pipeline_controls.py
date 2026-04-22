@@ -72,3 +72,16 @@ def test_pick_raw_csv_returns_latest_file(tmp_path: Path) -> None:
 
 def test_pick_raw_csv_none_when_empty(tmp_path: Path) -> None:
     assert pick_raw_csv(tmp_path) is None
+
+
+def test_pick_raw_csv_ignores_gitkeep(tmp_path: Path) -> None:
+    (tmp_path / ".gitkeep").write_text("", encoding="utf-8")
+    assert pick_raw_csv(tmp_path) is None
+
+
+def test_pick_raw_csv_prefers_csv_even_with_gitkeep(tmp_path: Path) -> None:
+    (tmp_path / ".gitkeep").write_text("", encoding="utf-8")
+    csv = tmp_path / "real_input.csv"
+    csv.write_text("x\n1\n", encoding="utf-8")
+    selected = pick_raw_csv(tmp_path)
+    assert selected == csv

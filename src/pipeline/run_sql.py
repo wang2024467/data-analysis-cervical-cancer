@@ -1,7 +1,7 @@
 import argparse
 import logging
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from typing import Optional
 
@@ -171,7 +171,7 @@ def evaluate_quality_gate(conn: duckdb.DuckDBPyConnection, config: dict, logger:
 
 
 def run_pipeline(config_path: Path) -> None:
-    run_id = f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:8]}"
+    run_id = f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:8]}"
     logger = build_logger(run_id)
     config = load_config(config_path)
 
