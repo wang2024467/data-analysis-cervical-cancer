@@ -23,8 +23,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Compile and run C++ risk profiler")
     parser.add_argument("--cpp", default="extensions/cpp/risk_profile.cpp")
     parser.add_argument("--csv", default="data/raw/risk_factors_cervical_cancer.csv")
-    parser.add_argument("--bin", default="outputs/risk_profile")
-    parser.add_argument("--out", default="outputs/tables/cpp_risk_profile.json")
+    parser.add_argument("--bin", default="extensions/outputs/bin/risk_profile")
+    parser.add_argument("--out", default="extensions/outputs/tables/cpp_risk_profile.json")
     args = parser.parse_args()
 
     cpp_path = Path(args.cpp)

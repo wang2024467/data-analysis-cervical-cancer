@@ -2,7 +2,7 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 in_csv <- if (length(args) >= 1) args[[1]] else "data/raw/risk_factors_cervical_cancer.csv"
-out_dir <- if (length(args) >= 2) args[[2]] else "outputs/figures"
+out_dir <- if (length(args) >= 2) args[[2]] else "extensions/outputs/figures"
 
 if (!file.exists(in_csv)) {
   stop(sprintf("Input CSV not found: %s", in_csv))

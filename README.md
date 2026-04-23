@@ -747,12 +747,12 @@ If you want to showcase additional language breadth for interviews, use the opti
 
 ### R stats demo
 ```bash
-Rscript extensions/r/eda_r_report.R data/raw/risk_factors_cervical_cancer.csv outputs/figures
+Rscript extensions/r/eda_r_report.R data/raw/risk_factors_cervical_cancer.csv extensions/outputs/figures
 ```
 
 ### C++ profiling demo (triggered by Python)
 ```bash
-python -m src.extensions.run_cpp_profile --csv data/raw/risk_factors_cervical_cancer.csv --out outputs/tables/cpp_risk_profile.json
+python -m src.extensions.run_cpp_profile --csv data/raw/risk_factors_cervical_cancer.csv --out extensions/outputs/tables/cpp_risk_profile.json
 ```
 
 See `extensions/README.md` for details.
