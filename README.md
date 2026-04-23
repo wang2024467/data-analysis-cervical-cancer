@@ -1,5 +1,16 @@
 # Cervical Cancer Data Project (Job-Ready Portfolio)
 
+# Reference Dataset
+## Dataset
+
+This project uses the **Cervical Cancer (Risk Factors)** dataset from the **UCI Machine Learning Repository**.
+
+**Citation**  
+Fernandes, K., Cardoso, J., & Fernandes, J. (2017). *Cervical Cancer (Risk Factors)* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5Z310
+
+**License**  
+This dataset is licensed under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.
+
 ## 1) Project Goal
 Build a **job-ready, end-to-end data project** using the Cervical Cancer Risk Factors dataset (858 patients, with missing values), designed to demonstrate the exact skills required by modern Data/AI roles:
 
