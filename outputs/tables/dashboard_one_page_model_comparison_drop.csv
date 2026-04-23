@@ -1,0 +1,9 @@
+kpi_name,kpi_value
+selected_model,random_forest
+selected_threshold,0.05
+selected_model_recall,0.1000
+selected_model_precision,0.5000
+selected_model_roc_auc,0.6255
+target_positive_rate,0.0575
+rows_used,852
+models_trained,"random_forest, logistic_regression, lightgbm, xgboost"

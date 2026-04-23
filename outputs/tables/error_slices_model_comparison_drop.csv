@@ -1,0 +1,15 @@
+slice_name,slice_value,error_type,error_count,slice_total_rows,error_rate_within_slice
+age_group,25-34,FN,3,62,0.04838709677419355
+age_group,25-34,FP,21,62,0.3387096774193548
+age_group,35-44,FP,16,25,0.64
+age_group,45-54,FP,1,3,0.3333333333333333
+age_group,55+,FP,1,1,1.0
+age_group,<=24,FN,2,80,0.025
+age_group,<=24,FP,13,80,0.1625
+is_smoker,0,FN,4,150,0.02666666666666667
+is_smoker,0,FP,45,150,0.3
+is_smoker,1,FN,1,21,0.047619047619047616
+is_smoker,1,FP,7,21,0.3333333333333333
+has_std_history,0,FN,5,157,0.03184713375796178
+has_std_history,0,FP,39,157,0.2484076433121019
+has_std_history,1,FP,13,14,0.9285714285714286
