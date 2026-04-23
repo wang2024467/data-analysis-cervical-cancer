@@ -13,7 +13,7 @@
 - logistic_regression: f1=0.2439, recall=0.4545, precision=0.1667, roc_auc=0.6143
 - random_forest: f1=0.1538, recall=0.0909, precision=0.5000, roc_auc=0.6669
 - lightgbm: f1=0.1333, recall=0.0909, precision=0.2500, roc_auc=0.6968
-- xgboost: f1=0.0000, recall=0.0000, precision=0.0000, roc_auc=0.6132
+- xgboost: f1=0.0000, recall=0.0000, precision=0.0000, roc_auc=0.6211
 
 ## Decision Policy
 - selected_model: `logistic_regression`

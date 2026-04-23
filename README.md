@@ -738,3 +738,21 @@ python -m src.reporting.export_powerbi_inputs --db data/processed/cervical_cance
 - data quality panel from check CSVs
 
 See `dashboards/powerbi/README.md` for the full, repeatable local-data workflow.
+
+---
+
+## 17) Optional Polyglot Extensions (R + C++)
+
+If you want to showcase additional language breadth for interviews, use the optional `extensions/` demos:
+
+### R stats demo
+```bash
+Rscript extensions/r/eda_r_report.R data/raw/risk_factors_cervical_cancer.csv outputs/figures
+```
+
+### C++ profiling demo (triggered by Python)
+```bash
+python -m src.extensions.run_cpp_profile --csv data/raw/risk_factors_cervical_cancer.csv --out outputs/tables/cpp_risk_profile.json
+```
+
+See `extensions/README.md` for details.
