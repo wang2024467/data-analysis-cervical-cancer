@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this repository, please also cite the dataset below."
+title: "data analysis: cervical cancer"
+url: "https://github.com/wang2024467/data-analysis-cervical-cancer"
+
+preferred-citation:
+  type: data
+  title: "Cervical Cancer (Risk Factors)"
+  authors:
+    - family-names: "Fernandes"
+      given-names: "K."
+    - family-names: "Cardoso"
+      given-names: "J."
+    - family-names: "Fernandes"
+      given-names: "J."
+  year: 2017
+  doi: "10.24432/C5Z310"
+  publisher: "UCI Machine Learning Repository"
+  url: "https://doi.org/10.24432/C5Z310"
