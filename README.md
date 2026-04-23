@@ -695,6 +695,18 @@ python -m src.modeling.train_compare --db data/processed/cervical_cancer.duckdb 
 - Records experiment notes for traceability.
 - Adds `inconsistent_flag` in modeling workflow.
 - Trains baseline (`logistic_regression`) and advanced models (`random_forest`, plus `xgboost` / `lightgbm` when available).
+- Exports decision-ready artifacts:
+  - threshold decision table (`threshold_decision_*.csv`) with recall/precision/FPR/FN/FP
+  - error slice table (`error_slices_*.csv`) by age group / smoker / STD history
+  - calibration table (`calibration_*.csv`) with Brier score
+  - quality summary table (`quality_summary_*.csv`) from null/range/consistency checks
+  - one-page dashboard KPI table (`dashboard_one_page_*.csv`)
+- Saves model figures to `outputs/figures/`:
+  - ROC curves
+  - PR curves
+  - threshold tradeoff chart
+  - confusion matrix heatmaps
+  - feature importance chart (for best model when available)
 
 ## 15) Quality Gate Profiles + CI
 
@@ -726,3 +738,21 @@ python -m src.reporting.export_powerbi_inputs --db data/processed/cervical_cance
 - data quality panel from check CSVs
 
 See `dashboards/powerbi/README.md` for the full, repeatable local-data workflow.
+
+---
+
+## 17) Optional Polyglot Extensions (R + C++)
+
+If you want to showcase additional language breadth for interviews, use the optional `extensions/` demos:
+
+### R stats demo
+```bash
+Rscript extensions/r/eda_r_report.R data/raw/risk_factors_cervical_cancer.csv outputs/figures
+```
+
+### C++ profiling demo (triggered by Python)
+```bash
+python -m src.extensions.run_cpp_profile --csv data/raw/risk_factors_cervical_cancer.csv --out outputs/tables/cpp_risk_profile.json
+```
+
+See `extensions/README.md` for details.

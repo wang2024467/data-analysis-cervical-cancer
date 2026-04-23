@@ -1,0 +1,4 @@
+check_name,observed_value,threshold,pass
+max_null_rate,0.12237762237762238,0.25,True
+range_violations_total,0.0,0.0,True
+consistency_violations_total,0.0,0.0,True
